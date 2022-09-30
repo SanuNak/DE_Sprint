@@ -186,7 +186,7 @@ def multipl_binary_numbers(binary_digit_list):
 
 if __name__ == "__main__":
     parsing_site_hh()
-    # checking_palindrom(input("Введите слово : ") or "Коток")
-    # get_rome_digit(int(input("\nВведите число до 2000 : ")) or 1945)
-    # checking_brackets(input("\nВведите набор скобок : ") or "{]")
-    # multipl_binary_numbers(input("\nВведите два бинарных числа через пробел : ").split() or ["111", "101"])
+    checking_palindrom(input("Введите слово : ") or "Коток")
+    get_rome_digit(int(input("\nВведите число до 2000 : ")) or 1945)
+    checking_brackets(input("\nВведите набор скобок : ") or "{]")
+    multipl_binary_numbers(input("\nВведите два бинарных числа через пробел : ").split() or ["111", "101"])
