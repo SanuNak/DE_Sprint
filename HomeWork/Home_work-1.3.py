@@ -28,13 +28,13 @@ def parsing_site_hh():
         'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.5112.114 YaBrowser/22.9.1.1095 Yowser/2.5 Safari/537.36'
     })
 
-    for page in range(1, 10):
+    for page in range(1, 5):
         url = f"https://hh.ru/search/vacancy?area=113&search_field=name&search_field=company_name&search_field=description&text=python+разработчик&clusters=true&ored_clusters=true&enable_snippets=true&page={page}&hhtmFrom=vacancy_search_list"
         response = sess.get(url)
         soup = BeautifulSoup(response.text, 'lxml')
         tags = soup.find_all(attrs={"data-qa": "serp-item__title"})
         for iter in tqdm.tqdm(tags):
-            time.sleep(0.5)
+            time.sleep(0.02)
             #
             url_object = iter.attrs["href"]
             resp_object = sess.get(url_object)
@@ -65,8 +65,8 @@ def parsing_site_hh():
                  "salary": tag_price,
                  "region": tag_region})
 
-            with open("data.json", "w") as file:
-                json.dump(data, file, ensure_ascii=False)
+            with open("data.json", "w", encoding='utf8') as file:
+                json.dump(data, file, indent=4, ensure_ascii=False)
 
 def checking_palindrom(str):
     str = str.replace(" ", "", ).lower()
@@ -186,7 +186,7 @@ def multipl_binary_numbers(binary_digit_list):
 
 if __name__ == "__main__":
     parsing_site_hh()
-    checking_palindrom(input("Введите слово : ") or "Коток")
-    get_rome_digit(int(input("\nВведите число до 2000 : ")) or 1945)
-    checking_brackets(input("\nВведите набор скобок : ") or "{]")
-    multipl_binary_numbers(input("\nВведите два бинарных числа через пробел : ").split() or ["111", "101"])
+    # checking_palindrom(input("Введите слово : ") or "Коток")
+    # get_rome_digit(int(input("\nВведите число до 2000 : ")) or 1945)
+    # checking_brackets(input("\nВведите набор скобок : ") or "{]")
+    # multipl_binary_numbers(input("\nВведите два бинарных числа через пробел : ").split() or ["111", "101"])

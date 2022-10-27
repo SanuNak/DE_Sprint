@@ -1,0 +1,341 @@
+// 1. Написать программу, которая сравнивает два введённых с клавиатуры числа. Программа должна указать, какое число больше или, если числа равны, вывести соответствующее сообщение.
+
+# include <iostream>
+using namespace std;
+
+int main()
+{
+    setlocale(0, "");
+    int a;
+    int b;
+    
+    cout << "Введите число a";
+    cin >> a;
+    
+    cout << "Введите число b";
+    cin >> b;
+    
+    if (a > b){
+        cout << "число a больше чем b";
+    }
+    else if (a < b){
+        cout << "число b больше чем a";
+    }
+    
+    else if (a == b){
+        cout << "число b равно чем a";
+    }
+
+}
+
+
+// 2. Написать программу, которая проверяет является ли год високосным.
+
+#include <stdio.h>
+int main(){
+    
+    int god;
+    
+    printf("vvedite god ");
+    scanf("%d",&god);
+    
+    if((god%4)  &&  (god%100 && god%400)){
+        printf("nevesokosniy god\n");
+    }
+    else{
+        printf("vesokosniy\n");
+    }
+    return 0;
+}
+
+// 3. Написать программу решения квадратного уравнения. Программа должна проверять правильность исходных данных и в случае, если коэффициент при второй степени неизвестного равен нулю, выводить соответствующее сообщение.
+
+#include <iostream>
+#include <math.h>
+using namespace std;
+int main()
+{ 
+	double d,x1,x2;
+	int a, c ;
+	int b;
+	cout << "Vvedite a ";
+	cin >> a;
+	if ( a==0 )
+	{
+		cout << " SOOBSHENIE " ;
+		return 0;
+	}
+	cout << "Vvedite b ";
+	cin >> b;
+	cout << "Vvedite c ";
+	cin >> c;
+	d=b*b-4*a*c ;
+	if ( d == 0 ) 
+	{ 
+		x1= -b/2*a ;
+		cout << " otvet X!= " << x1 << endl;
+	} 
+	else if ( d>0 )
+	{
+		x1=( -b-sqrt(d))/2*a;
+		x2 = (-b+sqrt(d))/2*a;
+		cout << " X2=" << x2 << endl;
+	}
+	else cout << "net kornei"<< endl;
+
+	return 0;
+}
+// 4. Проверить на чётность введённое с клавиатуры число
+
+#include <iostream>
+ 
+int main()
+{
+    int num;
+    std::cout << "Введите число для проверки";
+    std::cin >> num;
+    if(num%2)
+        std::cout << "Нечетное\n";
+    else
+        std::cout << "Четное\n";
+    return 0;
+}
+// Задача на цикл for!
+
+// 5. Написать программу, которая выводит таблицу квадратов десяти первых положительных чисел.
+
+#include <iostream>
+using std::cout;
+using std::endl;
+ 
+int main()
+{
+       int x =11, y;
+        for(int i=1; i < x; i++)
+        {y = i*i;
+        cout << i << " " << y << endl;}
+        
+return 0;
+}
+
+// Задача на цикл do while
+
+// 6. Написать программу, которая определяет максимальное число из введённой с клавиатуры последовательности положительных чисел. (длина последовательности неограниченна)
+
+#include <iostream>
+ 
+using namespace std ;
+ 
+int main()
+{
+        int i = 0;
+        int max = 0 ;
+        
+        cout<<"Enter i. 0 for end\n";
+        while(1)
+        {
+                cout<<"-> " ;
+                cin>>i;
+                if(i==0)
+                      break;
+                if( i > max )
+                        max = i ;
+        }
+        cout<<"Max is: "<< max <<'\n';
+        return 0;
+}
+
+// Задача на цикл while
+
+// 7. Написать программу, которая выводит таблицу значений функции y=-2 * x^2 - 5 * x - 8 в диапазоне от –4 до +4, с шагом 0,5
+
+#include<iostream>
+using namespace std;
+void foo();
+
+int main(){
+    
+foo();
+    return 0;
+    
+}
+void foo(){
+    double y=0;
+    double x=-4;
+    while(x<=4){
+        y = 2*x*x-5*x-8;
+        cout<<x<<"//"<<y<<endl;
+        x+=0.5;
+    }   
+}
+// Задача на функции С++
+
+// 8. Необходимо создать двумерный массив 5 х 5. Далее написать функцию, которая заполнит его случайными числами от 30 до 60. Создать еще две функции, которые находят максимальный и минимальный элементы этого двумерного массива.
+
+class Program
+    {
+        static int el = 5;
+        static void Main(string[] args)
+        {
+            var mas = new int[el, el];
+            Random rand = new Random();
+ 
+            for (int i = 0; i < el; i++)
+            {
+                for (int j = 0; j < el; j++)
+                {
+                    mas[i, j] = rand.Next(30, 60);
+                    Console.Write("{0,3}", mas[i, j]);
+                }
+                Console.WriteLine();
+            }
+ 
+            Console.WriteLine("Минимум: " + GetMin(mas));
+            Console.WriteLine("Максимум: " + GetMax(mas));
+ 
+            Console.ReadKey();
+        }
+ 
+        private static int GetMax(int[,] mas)
+        {
+            int result = mas[0, 0];
+            for (int i = 0; i < el; i++)
+                for (int j = 0; j < el; j++)
+                    if (result < mas[i, j])
+                        result = mas[i, j];
+            return result;
+        }
+ 
+        private static int GetMin(int[,] mas)
+        {
+            int result = mas[0, 0];
+            for (int i = 0; i < el; i++)
+                for (int j = 0; j < el; j++)
+                    if (result > mas[i, j])
+                        result = mas[i, j];
+            return result;
+        }
+    }
+// Задачи на ООП в С++
+
+// 9. Создайте структуру с именем student, содержащую поля: фамилия и инициалы, номер группы, успеваемость (массив из пяти элементов). Создать массив из десяти элементов такого типа, упорядочить записи по возрастанию среднего балла. Добавить возможность вывода фамилий и номеров групп студентов, имеющих оценки, равные только 4 или 5.
+
+public class Student {
+    private String name;
+    private int numberGroup;
+    private int[] progress = {0,0,0,0,0};
+ 
+    private Student(String name, int numberGroup, int[] progress) {
+        this.name = name;
+        this.numberGroup = numberGroup;
+        this.progress = progress;
+    }
+ 
+    private static void showBest(Student[] listStudents) {
+        for (Student student : listStudents) {
+            int flag = 0;
+            for (int a : student.progress) {
+                if (a < 9) {
+                    flag++;
+                }
+            }
+            if (flag == 0)
+                System.out.println(student.name + "  " + student.numberGroup);
+        }
+    }
+ 
+    public static void main(String[] args) {
+        Student[] listStudent = new Student[10];
+        listStudent[0] = new Student("Ivanov", 11, new int[]{5, 6, 7, 3, 9});
+        listStudent[1] = new Student("Petrov", 11, new int[]{9, 10, 9, 9, 9});
+        listStudent[2] = new Student("Pytin", 12, new int[]{8, 6, 7, 3, 10});
+        listStudent[3] = new Student("Timaty", 13, new int[]{5, 10, 7, 6, 9});
+        listStudent[4] = new Student("Loiko", 11, new int[]{9, 10, 9, 9, 9});
+        listStudent[5] = new Student("Izov", 12, new int[]{8, 6, 7, 7, 10});
+        listStudent[6] = new Student("Kolosov", 13, new int[]{9, 10, 9, 9, 9});
+        showBest(listStudent);
+ 
+    }
+ 
+}
+
+// 10. Создайте структуру с именем train, содержащую поля: название пункта назначения, номер поезда, время отправления. Ввести данные в массив из пяти элементов типа train, упорядочить элементы по номерам поездов. Добавить возможность вывода информации о поезде, номер которого введен пользователем. Добавить возможность сортировки массив по пункту назначения, причем поезда с одинаковыми пунктами назначения должны быть упорядочены по времени отправления.
+
+#include <iostream>
+#include <string>
+using namespace std;
+ 
+class train 
+{
+public:
+ 
+    string destination;
+    int tnumber;
+    int dp_hour;
+    int dp_min;
+ 
+};
+ 
+int main()
+{   
+    setlocale(LC_ALL, "rus");
+ 
+    const int size = 2;
+    train arr[size];
+ 
+    //ввод
+    for (int i = 0; i < size; i++) {
+        cout << "Укажите данные поезда " << i + 1 << "\n\nВведите место назначения: ";
+        getline(cin, arr[i].destination);
+        cout << "Введите номер поезда: ";
+        cin >> arr[i].tnumber;
+        cout << "Время отправления поезда: \n\tЧас:";
+        cin >> arr[i].dp_hour;
+        cout << "\tМинута: ";
+        cin >> arr[i].dp_min;
+        cout << "\n";
+        cin.ignore();
+    }
+ 
+    //сортировка
+    for (int i = 0; i < size - 1; i++) {
+        for (int j = i + 1; j < size; j++) {
+            if (arr[i].tnumber > arr[j].tnumber) {
+                train tmp = arr[i];
+                arr[i] = arr[j];
+                arr[j] = tmp;
+            }
+        }
+    }
+ 
+    //вывод инфы о поезде
+    char check = '+';
+    while (check != '-') {
+        cout << "Необходимо ли узнать информацию о поезде?(«+» - да, «-» - нет): ";
+        cin >> check;
+        if (check == '+') {
+            int index;
+            cout << "Введите номер поезда: ";
+            cin >> index;
+            for (int i = 0; i < size; i++) {
+                if (index == arr[i].tnumber) {
+                    cout << "Пункт назначения: " << arr[i].destination << "\nВремя отправления: " << arr[i].dp_hour << ":" << arr[i].dp_min;
+                }
+                else {
+                    cout << "Поезд с таким номером не найден.";
+                    break;
+                }
+            }
+        }
+        cout << "\n";
+    }
+    
+    //сортировка по пункту назначения
+ 
+ 
+    /* for (int i = 0; i < size; i++) {
+        cout << arr[i].destination << " ";
+    } */
+ 
+    return 0;
+}
