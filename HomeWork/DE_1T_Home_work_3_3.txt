@@ -1,0 +1,171 @@
+import pyspark.sql.types as T
+import pyspark.sql.functions as F
+from datetime import datetime
+from pyspark.sql import SparkSession
+
+# a.       Создайте схему будущего фрейма данных. =================================================================
+
+spark = SparkSession.\
+        builder.\
+        appName("pyspark-notebook").\
+        master("spark://spark-master:7077").\
+        config("spark.executor.memory", "512m").\
+        getOrCreate()
+
+schema = T.StructType([
+                T.StructField("id", T.IntegerType(), True),
+                T.StructField("site_visit", T.TimestampType(), True),
+                T.StructField("type", T.StringType(), True),
+                T.StructField("page_id", T.IntegerType(), True),
+                T.StructField("tag", T.StringType(), True),
+                T.StructField("sign", T.BooleanType(), True)])
+
+# b.       Создайте датафрейм с описанной выше схемой данных. =================================================================
+# c.       Наполните датафрейм данными. Пример:               =================================================================
+
+data = [
+    [11, datetime.strptime("2018-07-21 01:30:20", "%Y-%m-%d %H:%M:%S"), "click", 101, "Economic", True],
+    [11, datetime.strptime("2019-01-21 20:30:20", "%Y-%m-%d %H:%M:%S"), "move", 101, "Music", True],
+    [11, datetime.strptime("2020-04-21 11:30:20", "%Y-%m-%d %H:%M:%S"), "click", 101, "Music", True],
+    [11, datetime.strptime("2020-07-21 10:30:20", "%Y-%m-%d %H:%M:%S"), "scroll", 101, "Sport", True],
+    [12, datetime.strptime("2021-10-21 12:30:20", "%Y-%m-%d %H:%M:%S"), "visit", 202, "Sport", True],
+    [12, datetime.strptime("2021-11-21 22:30:20", "%Y-%m-%d %H:%M:%S"), "click", 202, "Sport", True],
+    [12, datetime.strptime("2021-12-21 12:30:20", "%Y-%m-%d %H:%M:%S"), "click", 202, "Sport", True],
+    [34567, datetime.strptime("2021-09-21 13:30:20", "%Y-%m-%d %H:%M:%S"), "move", 303, "Politic", False],
+    [34567, datetime.strptime("2021-09-29 03:30:20", "%Y-%m-%d %H:%M:%S"), "click", 303, "Politic", False],
+    [45678, datetime.strptime("2021-10-21 07:30:20", "%Y-%m-%d %H:%M:%S"), "scroll", 404, "Sport", False],
+    [15, datetime.strptime("2021-11-21 23:30:20", "%Y-%m-%d %H:%M:%S"), "click", 505, "Medicine", True],
+    [16, datetime.strptime("2021-12-21 16:30:20", "%Y-%m-%d %H:%M:%S"), "move", 404, "Sport", True],
+    [17, datetime.strptime("2022-01-21 17:30:20", "%Y-%m-%d %H:%M:%S"), "click", 404, "Music", True],
+    [18, datetime.strptime("2022-02-21 08:30:20", "%Y-%m-%d %H:%M:%S"), "move", 404, "Sport", True],
+    [19, datetime.strptime("2022-03-21 21:30:20", "%Y-%m-%d %H:%M:%S"), "visit", 404, "Music", True],
+    [20, datetime.strptime("2022-04-21 10:30:20", "%Y-%m-%d %H:%M:%S"), "click", 404, "Sport", True]
+    ]
+
+df = spark.createDataFrame(data=data, schema = schema)
+
+print("Задачи № a, b и с Ниже отабражен наполненный DataFrame и его схема")
+df.show()
+df.printSchema()
+
+# d.       Решите следующие задачи:               =================================================================
+# d·1.   Вывести топ-5 самых активных посетителей сайта +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+print("Задача № d·1. Топ-5 самых активных посетителей сайта")
+df.groupBy("id")\
+    .agg(F.count("*").alias("cnt"))\
+    .orderBy("cnt", ascending = False)\
+    .show(5)
+
+# d.2   Посчитать процент посетителей, у которых есть ЛК +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+print("Задача № d·2. Посчитать процент посетителей, у которых есть ЛК")
+from pyspark.sql.window import Window
+w = Window.partitionBy('sign')
+
+df.groupBy("sign")\
+    .agg(F.count("*").alias("count"))\
+    .withColumn('percentage %', F.floor(F.col('count')* 100 / F.sum('count')\
+    .over(Window.partitionBy())))\
+    .show()
+
+
+# d.3   Вывести топ-5 страниц сайта по показателю общего кол-ва кликов на данной странице ++++++++++++++++++++++++++
+
+print("Задача № d·3. Вывести топ-5 страниц сайта по показателю общего кол-ва кликов на данной странице")
+df.groupBy("page_id", "type")\
+    .agg(F.count("type").alias("count"))\
+    .where(F.col("type") == "click")\
+    .orderBy("count", ascending=False)\
+    .show(5)
+
+
+# d.4   Добавьте столбец к фрейму данных со значением временного диапазона ++++++++++++++++++++++++++++++++++++++++
+# в рамках суток с размером окна – 4 часа(0-4, 4-8, 8-12 и т.д.)
+
+print("Задача № d·4. Добавьте столбец к фрейму данных со значением временного \
+      диапазона в рамках суток с размером окна – 4 часа")
+df = df.withColumn("time_range", F.floor(F.hour("site_visit") / F.lit(4)))
+
+# d.5   Выведите временной промежуток на основе предыдущего задания,  
+# в течение которого было больше всего активностей на сайте. +++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+print("Задача № d·5. Временной промежуток на основе предыдущего задания, \
+      в течение которого было больше всего активностей на сайте")
+
+df.groupBy("time_range").agg(F.count("time_range").alias("count")).\
+    groupBy().agg(F.max("count").alias("max_actions")).show()
+
+
+# d.6  Создайте второй фрейм данных, который будет содержать ++++++++++++++++++++++++++++++++++++++++++++++++++++
+#    информацию о ЛК посетителя сайта со следующим списком атрибутов
+#        1. Id – уникальный идентификатор личного кабинета
+#        2. User_id – уникальный идентификатор посетителя
+#        3. ФИО посетителя
+#        4. Дату рождения посетителя 
+#        5. Дата создания ЛК
+
+schema_users = T.StructType([
+                T.StructField("lc_id", T.IntegerType(), True),
+                T.StructField("user_id", T.IntegerType(), True),
+                T.StructField("user_name", T.StringType(), True),
+                T.StructField("birst_day", T.DateType(), True),
+                T.StructField("lc_create_date", T.DateType(), True)
+])
+
+data_users = [
+    (1, 11, "Симако Добрыня Купидонович", datetime(1982, 9, 3), datetime(2017, 3, 4)),
+    (2, 12, "Склокин Ерема Плантонович", datetime(1993, 4, 15), datetime(2017, 12, 6)),    
+    (3, 13, "Незнайкин Гаврило Иванович", datetime(1973, 2, 15), datetime(2016, 10, 6)),    
+    (4, 14, "Хрюшин Инокентий Иванович", datetime(1963, 4, 15), datetime(2015, 12, 6)),    
+    (5, 15,"Степашкин Полиграф Иванович", datetime(1994, 8, 15), datetime(2012, 12, 6)),    
+    (6, 16, "Каркушина Еремея Иванович", datetime(1999, 5, 15), datetime(2015, 12, 6)),    
+    (7, 17, "Филина Агафья Иванович", datetime(2001, 4, 15), datetime(2017, 12, 6)),    
+    (8, 18, "Печкин Вольффрам  Иванович", datetime(2000, 12, 15), datetime(2010, 12, 6)), 
+    
+    (9,  19, "Щеглов Добрыня Купидонович", datetime(1982, 9, 3), datetime(2017, 3, 4)),
+    (10, 20, "Воробьев Ерема Плантонович", datetime(1993, 4, 15), datetime(2017, 12, 6)),    
+    (11, 21, "Пташкин Гаврило Иванович", datetime(1973, 2, 15), datetime(2016, 10, 6)),    
+    (12, 22, "Воронин Инокентий Иванович", datetime(1963, 4, 15), datetime(2015, 12, 6)),    
+    (13, 23, "Синичкин Полиграф Иванович", datetime(1994, 8, 15), datetime(2012, 12, 6)),    
+    (14, 24, "Незабудкина Еремея Иванович", datetime(1999, 5, 15), datetime(2015, 12, 6)),    
+    (15, 25, "Галкина Агафья Иванович", datetime(2001, 4, 15), datetime(2017, 12, 6)),    
+    (16, 26, "Воробушкин Вольффрам  Иванович", datetime(2000, 12, 15), datetime(2010, 12, 6)),       
+
+    (17, 27, "Сыраешкин Добрыня Купидонович", datetime(1982, 9, 3), datetime(2017, 3, 4)),
+    (18, 28, "Подберезовиков Ерема Плантонович", datetime(1993, 4, 15), datetime(2017, 12, 6)),    
+    (19, 29, "Лисичкин Гаврило Иванович", datetime(1973, 2, 15), datetime(2016, 10, 6)),    
+    (20, 30, "Опятов Инокентий Иванович", datetime(1963, 4, 15), datetime(2015, 12, 6)),    
+    (21, 31, "Мухоморов Полиграф Иванович", datetime(1994, 8, 15), datetime(2012, 12, 6)),    
+    (22, 32, "Поганкина Еремея Иванович", datetime(1999, 5, 15), datetime(2015, 12, 6)),    
+    (23, 33, "Вешкина Агафья Иванович", datetime(2001, 4, 15), datetime(2017, 12, 6)),    
+    (24, 34, "Подосинников Вольффрам  Иванович", datetime(2000, 12, 15), datetime(2010, 12, 6)),   
+]
+
+df_users = spark.createDataFrame(data=data_users, schema = schema_users)
+
+print("Задача № d.6  Создайте второй фрейм данных, который будет содержать \
+      информацию о ЛК посетителя сайта")
+
+df_users.show()
+df_users.printSchema()
+
+
+# d.7   Вывести фамилии посетителей, которые читали хотя бы одну новость про спорт. +++++++++++++++++++++++++++++++++++++++
+
+df_all = df_users.alias("users").join(df.alias("site"),
+                                    on = [F.col("users.user_id") == F.col("site.id")],
+                                    how = "left")
+
+print("Задача № d.7   Вывести фамилии посетителей, которые читали хотя бы одну новость про спорт.")
+df_all.where(F.col("tag") == "Sport").select("user_name").distinct().show()
+
+# d.8   Выведите 10% ЛК, у которых максимальная разница между датой создания ЛК и датой последнего посещения. ++++++++++++
+
+print("Задача № d.8   Выведите 10% ЛК, у которых максимальная разница между датой создания ЛК и датой последнего посещения")
+
+lc_number = lc_number = round(df_all.count()*0.1)
+
+df_all.withColumn('ten_percent_lk', F.datediff(F.col('site_visit'), F.col('lc_create_date')))\
+.select("lc_id", "user_name", "ten_percent_lk")\
+.orderBy("ten_percent_lk", ascending = False).show(lc_number)
